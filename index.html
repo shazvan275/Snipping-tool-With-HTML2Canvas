@@ -1,0 +1,212 @@
+<html>
+<head>
+	<title>Snipping tool With HTML2Canvas</title>
+   <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+   <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.svg.js"></script>
+</head>
+<body>
+   <div id="selection"></div>
+   <br><br>
+   <p>click on capture button and select the screen</p>
+   <button onclick="scnsht();">capture</button>
+   <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lobortis vestibulum tellus, quis condimentum nisl volutpat non. Nullam tristique ultricies metus, ut malesuada lectus tristique non. Etiam rhoncus ipsum in dui consequat, ut dapibus libero gravida. Suspendisse vitae tincidunt metus. Nullam tristique lacus sed rutrum dignissim. Vestibulum pulvinar euismod sem, eu aliquet purus sodales vitae. Praesent sodales ultricies erat a venenatis. Proin faucibus risus quis vehicula ullamcorper. Suspendisse sed pulvinar felis. Nulla eget purus ut arcu luctus eleifend id vel magna. Fusce a neque id quam posuere vestibulum a at nibh. Vivamus egestas ante lectus, vitae ullamcorper velit ultrices non. Donec pulvinar risus in purus vulputate accumsan.
+      Aliquam pharetra consectetur pretium. Aenean sit amet pellentesque libero. Suspendisse non augue nisl. Fusce ut nulla vitae nisl lobortis maximus consectetur eu elit. Nulla blandit urna ut lorem venenatis, in maximus erat congue. Suspendisse id risus id arcu blandit rutrum vitae sit amet ex. Cras semper euismod congue. Integer malesuada sed mauris id tempus. Aenean sed feugiat eros, eu dignissim nunc. Maecenas porttitor et turpis et placerat. Cras condimentum, justo ac imperdiet luctus, tellus enim ullamcorper diam, id egestas urna nisl sed sem. Curabitur fringilla leo eget rutrum vehicula. Phasellus efficitur ante odio, sit amet tempor sapien placerat venenatis. Aenean sed urna dolor. Morbi rhoncus sem augue, eget eleifend nisi porta ut.
+      Proin facilisis neque mauris, sed dictum ex aliquam sed. Sed sed libero at augue mollis convallis. Nullam nec posuere nibh, nec tristique mauris. Fusce pulvinar a dui sit amet volutpat. In vel molestie turpis, sed facilisis mauris. Etiam aliquam a ante sed efficitur. Proin pretium lacinia nunc, eu ultrices nisi mollis eget. Vivamus ut metus elementum dui gravida laoreet. Nunc porttitor volutpat libero quis scelerisque.
+      Ut eros purus, volutpat sit amet rutrum eget, tempor eget lectus. Quisque ultricies, felis sed interdum ultricies, nunc orci dictum lectus, et ultrices libero turpis vel elit. Integer finibus nunc at sapien porttitor sollicitudin. Phasellus facilisis, erat a volutpat ultrices, ipsum velit dictum eros, eget tincidunt metus ligula et arcu. Mauris quis condimentum tortor. Suspendisse faucibus vitae est sit amet gravida. Nam tempus pharetra velit. Phasellus facilisis odio odio, quis semper leo pellentesque et. Maecenas laoreet condimentum odio, eu dignissim odio ultrices eu. Vivamus in suscipit tortor. Duis quis eros ut lorem sodales efficitur at ac felis. In commodo, lectus cursus dignissim aliquam, nibh magna tempor nibh, eget viverra dolor mi ac ex. Vivamus semper nisi non nibh mollis efficitur. Sed quis feugiat lorem. Aliquam et felis vitae sem malesuada sagittis at vel dolor. Proin quis dolor non ante laoreet scelerisque.
+      Donec ornare eleifend malesuada. Sed id nulla quis lectus iaculis maximus. Mauris congue, ex id finibus fermentum, mauris odio tempus tellus, sit amet cursus lorem dolor at quam. Aenean ultricies dui et ornare faucibus. Maecenas sed mauris erat. In at blandit purus. Vivamus aliquam ut odio et eleifend. Fusce eget diam consectetur, mattis mi nec, elementum lorem. Vestibulum nisi sapien, egestas at gravida sed, tincidunt quis arcu. Morbi consequat quis lectus quis mattis. Maecenas hendrerit lorem et tortor volutpat tristique. Morbi lorem odio, tristique vitae pellentesque et, ullamcorper dapibus ligula. Nullam vel lorem feugiat, venenatis ipsum eu, porttitor magna. Donec bibendum at velit nec ornare.
+   </p>
+   <div style="display:none">
+      <div id="screenshtdialog"  title="Your Screen Shot">
+         <div class="header">
+            <button class="btn btn-primary"  onclick="savescrn()" >Save Image</button>
+            <button class="btn btn-primary" onclick="editscrn();">Edit Image</button>
+         </div>
+      </div>
+   </div>
+</body>
+
+<script>
+// Things we need to keep track of
+var start = {};
+var end = {};
+var isSelecting = false;
+
+function scnsht() {
+	$(window)
+		// Listen for selection
+		.on('mousedown', function ($event) {
+			// Update our state
+			isSelecting = true;
+			$('#selection').removeClass('complete');
+			start.x = $event.pageX;
+			start.y = $event.pageY;
+			// Add selection to screen
+			$('#selection').css({
+				left: start.x,
+				top: start.y
+			});
+		})
+		// Listen for movement
+		.on('mousemove', function ($event) {
+			// Ignore if we're not selecing
+			if (!isSelecting) {
+				return;
+			}
+
+			// Update our state
+			end.x = $event.pageX;
+			end.y = $event.pageY;
+
+			// Move & resize selection to reflect mouse position
+			$('#selection').css({
+				left: start.x < end.x ? start.x : end.x,
+				top: start.y < end.y ? start.y : end.y,
+				width: Math.abs(start.x - end.x),
+				height: Math.abs(start.y - end.y)
+			});
+		})
+		// listen for end
+		.on('mouseup', function ($event) {
+			// Update our state
+			isSelecting = false;
+			$('#selection').addClass('complete');
+			$(window).unbind();
+			setTimeout(function () {
+				$('#selection').removeClass('complete');
+			}, 2000);
+
+			screenshot(document.body, {
+				x: start.x < end.x ? start.x : end.x,
+				y: start.y < end.y ? start.y : end.y,
+				width: Math.abs(start.x - end.x),
+				height: Math.abs(start.y - end.y),
+				useCORS: true
+			}).then(function (c) {
+				$(c).attr('id', 'scrnshtcanvas');
+				$("#scrnshtcanvas").remove();
+				$("#screenshtdialog").append(c);
+
+				$("#screenshtdialog").dialog({
+					width: 700
+				});
+
+
+			})
+		});
+}
+
+function screenshot(element, options) {
+	// our cropping context
+	var cropper = document.createElement('canvas').getContext('2d');
+	// save the passed width and height
+	var finalWidth = options.width || window.innerWidth;
+	var finalHeight = options.height || window.innerHeight;
+	// update the options value so we can pass it to h2c
+	if (options.x) {
+		options.width = finalWidth + options.x;
+	}
+	if (options.y) {
+		options.height = finalHeight + options.y;
+	}
+
+
+	// chain h2c Promise
+	return html2canvas(element, options).then(function (c) {
+
+		// do our cropping
+		cropper.canvas.width = finalWidth;
+		cropper.canvas.height = finalHeight;
+		cropper.drawImage(c, -(+options.x || 0), -(+options.y || 0));
+		// return our canvas
+		return cropper.canvas;
+	});
+}
+
+function editscrn() {
+
+	var canvas = document.getElementById('scrnshtcanvas');
+	var ctx = canvas.getContext('2d');
+
+	//Variables
+	var canvasx = $(canvas).offset().left;
+	var canvasy = $(canvas).offset().top;
+	var last_mousex = 0;
+	var last_mousey = 0;
+	var mousex = 0;
+	var mousey = 0;
+	var mousedown = false;
+
+	//Mousedown
+	$(canvas).on('mousedown', function (e) {
+		last_mousex = mousex = parseInt(e.clientX - canvasx);
+		last_mousey = mousey = parseInt(e.clientY - canvasy);
+		mousedown = true;
+	});
+
+	//Mouseup
+	$(canvas).on('mouseup', function (e) {
+		mousedown = false;
+	});
+
+	//Mousemove
+	$(canvas).on('mousemove', function (e) {
+		mousex = parseInt(e.clientX - canvasx);
+		mousey = parseInt(e.clientY - canvasy);
+		if (mousedown) {
+			ctx.beginPath();
+
+			ctx.globalCompositeOperation = 'source-over';
+			ctx.strokeStyle = 'red';
+			ctx.lineWidth = 3;
+
+			ctx.moveTo(last_mousex, last_mousey);
+			ctx.lineTo(mousex, mousey);
+			ctx.lineJoin = ctx.lineCap = 'round';
+			ctx.stroke();
+		}
+		last_mousex = mousex;
+		last_mousey = mousey;
+		//Output
+
+	});
+
+}
+
+function savescrn() {
+	var canvas = document.getElementById('scrnshtcanvas');
+
+	var FileUrl = canvas.toDataURL("image/png");
+
+
+	var a = document.createElement('a');
+	a.href = FileUrl.replace("image/png", "image/octet-stream");
+	a.download = 'SCREENSHOT_.png';
+	a.click();
+
+	$("#screenshtdialog").dialog('close');
+}
+</script>
+<style>
+#selection {
+    position: absolute;
+    background: transparent;
+    border: 1px solid #0c65a5;
+}
+
+#selection.complete {
+    background: transparent;
+    border-color: #0CA50E;
+}
+canvas{
+	cursor: crosshair;
+	margin:5px;
+}
+#screenshtdialog{
+	text-align:center;
+}
+</style>
+</html>
